@@ -1,0 +1,7 @@
+@startuml
+Engine -> Engine:doSomething()
+System ->Engine:getFuelType()
+Engine --> System:String
+System ->Engine:getSize()
+Engine --> System:int
+@enduml
