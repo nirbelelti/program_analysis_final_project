@@ -1,17 +1,18 @@
 import json
 
 def create_sequence_diagram(data_dict):
-    methods = stuck_of_executed_methods(data_dict)
-    for method in methods:
 
-        print('Method:', method)
+    my_file = open("Diagrams/MyDynamicSequenceDiagram.puml", "w+")
+    my_file.write("@startuml\n")
 
-def stuck_of_executed_methods(
-        data_dict):  # Since we are incrementing our interpretation over various methods, it creates a list of methods.
-    methods = []
-    for obj in data_dict['methods']:
-        methods.append(obj['name'])
-    return methods
+
+    for method in data_dict['methods']:
+        method_name = method['name']
+        my_file.write("class_name -> class_name :"+ str(method_name)+"()\n")
+
+    my_file.write("@enduml")
+    my_file.close()
+
 
 
 if __name__ == '__main__':
