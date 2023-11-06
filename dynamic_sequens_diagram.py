@@ -17,7 +17,7 @@ def create_sequence_diagram(data_dict):
         method_name = method['name']
         bytecode = method["code"]["bytecode"]
         returns_object, return_type = has_returned_object_type(bytecode)
-        calling_method = "actor" if returns_object else class_name
+        calling_method = "Actor" if returns_object else class_name
         my_file.write( calling_method+" -> " + class_name + " : "+ str(method_name)+"()\n")
 
         if returns_object:
