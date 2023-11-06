@@ -117,7 +117,7 @@
         "max_locals": 0,
         "exceptions": [],
         "stack_map": null,
-        "btecode": [
+        "bytecode": [
           {
             "offset": 0,
             "opr": "push",
