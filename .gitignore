@@ -1,5 +1,5 @@
 ### Python template
-Diagrams/
+Diagrams/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
