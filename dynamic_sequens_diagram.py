@@ -29,11 +29,12 @@ def call_method(bytecode, method_name, caller_class):
                     ) + " -> " + invoked_class_name.capitalize() + " : " + invoked_method_name + "(" + values + ")" + "\n")
                     if invoked_method_name == '<init>':
                         my_file.write(invoked_class_name.capitalize(
-                        ) + " --> " + invoked_class_name.capitalize() + " : " + invoked_class_name + "()\n")
+                        ) + " --> " + caller_class.capitalize() + " : " + invoked_class_name + "()\n")
                     else:
                         my_file.write(invoked_class_name.capitalize(
-                        ) + " --> " + invoked_class_name.capitalize() + " : " + invoked_method_name + "()\n")
+                        ) + " --> " + caller_class.capitalize() + " : " + invoked_method_name + "()\n")
             arg_values = []
+
 
 def create_sequence_diagram(data_dict, my_file):
     my_file.write("@startuml\n")
