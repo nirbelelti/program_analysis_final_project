@@ -16,6 +16,12 @@ def call_method(bytecode, method_name, caller_class):
             invoked_class_name = instruction.get(
                 "method", {}).get("ref", {}).get("name")
             invoked_method_name = instruction.get("method", {}).get("name")
+            for name in instruction.get(
+                "method", {}).get("args"):
+               if isinstance(name, dict): # Take to consideration arguments that are instances of class into the constractor.
+                   if name.get('kind',{}) == 'class':
+                        if name.get('name') and 'java/' not in name.get('name') and  name.get('name') != invoked_class_name:
+                            arg_values.append({'type': name.get('kind'), 'value': name.get('name')})
 
             if invoked_class_name:
                 if 'java/' in invoked_class_name:
@@ -29,7 +35,7 @@ def call_method(bytecode, method_name, caller_class):
                     ) + " -> " + invoked_class_name.capitalize() + " : " + invoked_method_name + "(" + values + ")" + "\n")
                     if invoked_method_name == '<init>':
                         my_file.write(invoked_class_name.capitalize(
-                        ) + " --> " + caller_class.capitalize() + " : " + invoked_class_name + "()\n")
+                        ) + " --> " + caller_class.capitalize() + " : " + invoked_class_name + "\n")
                     else:
                         my_file.write(invoked_class_name.capitalize(
                         ) + " --> " + caller_class.capitalize() + " : " + invoked_method_name + "()\n")
