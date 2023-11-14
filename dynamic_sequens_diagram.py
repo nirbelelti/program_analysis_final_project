@@ -30,15 +30,16 @@ def call_method(bytecode, method_name, caller_class):
                     values = ""
                     for value in arg_values:
                         values += (str(value['type']) + ": " + str(value['value']) + ", ")
-
                     my_file.write(caller_class.capitalize(
                     ) + " -> " + invoked_class_name.capitalize() + " : " + invoked_method_name + "(" + values + ")" + "\n")
+                    my_file.write("activate " + invoked_class_name + "\n")
                     if invoked_method_name == '<init>':
                         my_file.write(invoked_class_name.capitalize(
                         ) + " --> " + caller_class.capitalize() + " : " + invoked_class_name + "\n")
                     else:
                         my_file.write(invoked_class_name.capitalize(
                         ) + " --> " + caller_class.capitalize() + " : " + invoked_method_name + "()\n")
+                    my_file.write("deactivate " + invoked_class_name + "\n")
             arg_values = []
 
 
@@ -48,6 +49,8 @@ def create_sequence_diagram(data_dict, my_file):
 
     def process_method(method, caller_class):
         method_name = method['name']
+        if method_name != '<init>':
+            my_file.write("activate " + method_name.capitalize() + "\n")
         bytecode = method["code"]["bytecode"]
         returns_object, return_type = has_returned_object_type(bytecode, caller_class)
         calling_method = "Actor" if returns_object else caller_class
@@ -67,6 +70,8 @@ def create_sequence_diagram(data_dict, my_file):
                         continue
                 else:
                     continue
+        if method_name != '<init>':
+            my_file.write("deactivate " + method_name.capitalize() + "\n")
 
     for method in data_dict['methods']:
         class_name = data_dict["name"].replace("/", "_")
