@@ -1,6 +1,6 @@
 import re
 import graphviz
-import plantuml
+# import plantuml
 
 
 def extract_regular_methods_from_java_file(file_path):

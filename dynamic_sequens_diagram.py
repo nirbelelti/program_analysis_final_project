@@ -30,6 +30,9 @@ def call_method(bytecode, method_name, caller_class):
                     values = ""
                     for value in arg_values:
                         values += (str(value['type']) + ": " + str(value['value']) + ", ")
+                    #   Delete remain comma of the last parameter
+                    if values[-2:] == ", ":
+                        values = values[:-2]
                     my_file.write(caller_class.capitalize(
                     ) + " -> " + invoked_class_name.capitalize() + " : " + invoked_method_name + "(" + values + ")" + "\n")
                     my_file.write("activate " + invoked_class_name + "\n")
