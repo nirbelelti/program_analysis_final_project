@@ -4,6 +4,7 @@ Diagrams/*
 __pycache__/
 *.py[cod]
 *$py.class
+.Diagrams
 
 # C extensions
 *.so
