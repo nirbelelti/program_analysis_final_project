@@ -54,8 +54,10 @@ def create_sequence_diagram(data_dict, output_file):
 
     def process_method(method, caller_class):
         method_name = method['name']
-        if method_name != '<init>':
-            output_file.write("activate " + method_name.capitalize() + "\n")
+                #############
+        # if method_name != '<init>':
+        #     output_file.write("activate " + method_name.capitalize() + "\n")
+            ############
         bytecode = method["code"]["bytecode"]
         returns_object, return_type = has_returned_object_type(bytecode, caller_class)
         calling_method = "Actor" if returns_object else caller_class
@@ -75,8 +77,10 @@ def create_sequence_diagram(data_dict, output_file):
                         continue
                 else:
                     continue
-        if method_name != '<init>':
-            output_file.write("deactivate " + method_name.capitalize() + "\n")
+                #########
+        # if method_name != '<init>':
+        #     output_file.write("deactivate " + method_name.capitalize() + "\n")
+        #########
 
     for method in data_dict['methods']:
         class_name = data_dict["name"].replace("/", "_")
