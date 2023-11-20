@@ -1,40 +1,32 @@
 @startuml
 activate Main
-Main -> engine1_Engine : newEngine("Petrol", 2000)
-activate engine1_Engine
-engine1_Engine --> Main : Engine
-deactivate engine1_Engine
-Main -> car1_Car : newCar("Toyota", 2015, "Corolla", engine1)
-activate car1_Car
-car1_Car --> Main : Car
-deactivate car1_Car
-Main -> engine2_Engine : newEngine("Diesel", 2500)
-activate engine2_Engine
-engine2_Engine --> Main : Engine
-deactivate engine2_Engine
-Main -> car2_Car : newCar("Ford", 2020, "Mustang", engine2)
-activate car2_Car
-car2_Car --> Main : Car
-deactivate car2_Car
-Main -> engine2_Engine : getFuelType()
-activate engine2_Engine
-engine2_Engine --> Main : String
-deactivate engine2_Engine
-Main -> car2_Car : getManufacturer()
-activate car2_Car
-car2_Car --> Main : String
-deactivate car2_Car
-Main -> person_Person : newPerson("John")
-activate person_Person
-person_Person --> Main : Person
-deactivate person_Person
-Main -> person_Person : addCar(car1)
-activate person_Person
-person_Person --> Main : void
-deactivate person_Person
-Main -> person_Person : addCar(car2)
-activate person_Person
-person_Person --> Main : void
-deactivate person_Person
+Main -> Engine : newEngine("Petrol", 2000)
+activate Engine
+Engine --> Main : Engine
+deactivate Engine
+Main -> Car : newCar("Toyota", 2015, "Corolla", engine1)
+activate Car
+Car --> Main : Car
+deactivate Car
+Main -> Engine : newEngine("Diesel", 2500)
+activate Engine
+Engine --> Main : Engine
+deactivate Engine
+Main -> Car : newCar("Ford", 2020, "Mustang", engine2)
+activate Car
+Car --> Main : Car
+deactivate Car
+Main -> Person : newPerson("John")
+activate Person
+Person --> Main : Person
+deactivate Person
+Main -> Person : addCar(car1)
+activate Person
+Person --> Main : void
+deactivate Person
+Main -> Person : addCar(car2)
+activate Person
+Person --> Main : void
+deactivate Person
 deactivate Main
 @enduml
