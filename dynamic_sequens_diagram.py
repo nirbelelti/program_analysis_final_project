@@ -37,14 +37,14 @@ def call_method(bytecode, output_file, caller_class):
                         values = values[:-2]
                     output_file.write(caller_class.capitalize(
                     ) + " -> " + invoked_class_name.capitalize() + " : " + invoked_method_name + "(" + values + ")" + "\n")
-                    output_file.write("activate " + invoked_class_name + "\n")
+                    output_file.write("activate " + invoked_class_name.capitalize() + "\n")
                     if invoked_method_name == '<init>':
                         output_file.write(invoked_class_name.capitalize(
                         ) + " --> " + caller_class.capitalize() + " : " + invoked_class_name + "\n")
                     else:
                         output_file.write(invoked_class_name.capitalize(
                         ) + " --> " + caller_class.capitalize() + " : " + invoked_method_name + "()\n")
-                    output_file.write("deactivate " + invoked_class_name + "\n")
+                    output_file.write("deactivate " + invoked_class_name.capitalize() + "\n")
             arg_values = []
 
 
