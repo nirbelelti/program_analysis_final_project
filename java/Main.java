@@ -52,7 +52,6 @@ class Car {
 class Person {
     private String name;
     private List<Car> cars;
-
     public Person(String name) {
         this.name = name;
         this.cars = new ArrayList<>();
