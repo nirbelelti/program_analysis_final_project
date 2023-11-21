@@ -91,14 +91,7 @@ class Person {
 }
 
 public class Main {
-    public static void print_cars(Person person){
-        ArrayList<Car> cars = (ArrayList<Car>) person.getCars();
-        for(int i = 0; i< cars.size(); i++){
 
-           cars.get(i).getModel();
-        }
-
-    }
     public static void main(String[] args) {
         Engine engine1 = new Engine("Petrol", 2000);
         Car car1 = new Car("Toyota", 2015, "Corolla", engine1);
@@ -114,8 +107,6 @@ public class Main {
            person.getCars().get(i).getManufacturer();
 
         }
-
-        print_cars(person);
 
         if(person.getCars().size()>0){
             person.calculateInsuranceFee();
