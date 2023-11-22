@@ -1,0 +1,9 @@
+@startuml
+            car.getManufacturer();
+            person.calculateInsuranceFee();
+            car1.getManufacturer();
+        } else {
+            car2.getManufacturer();
+        int carsAmount = cars.size();
+        while (carsAmount--) {
+@enduml

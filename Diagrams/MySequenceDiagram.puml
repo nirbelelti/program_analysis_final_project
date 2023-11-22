@@ -34,7 +34,7 @@ activate Car
 Car --> Main : String
 deactivate Car
 end
-alt person.getCars().size()>0
+alt person.getCars().size() > 0
 Main -> Person : calculateInsuranceFee()
 activate Person
 Person --> Main : double
