@@ -3,8 +3,9 @@ import re
 import graphviz
 from tree_sitter import Language, Parser
 # Set execution method
-EXECUTION_CLASS_NAME = "Person"
-EXECUTION_METHOD_NAME = "addCar"
+EXECUTION_CLASS_NAME = "Main"
+EXECUTION_METHOD_NAME = "main"
+JAVA_FILE_PATH = "java/CarWithLoopAndIf.java"
 def is_basic_type(type):
     basic_types = ["byte", "short", "int", "long", "float", "double", "char", "boolean", "String", "Boolean", "Character", "Number", "Date"]
     for basic_type in basic_types:
@@ -126,17 +127,18 @@ def extract_class_method_call_data_from_java_file(file_path, execution_class_nam
                         root_node = tree.root_node
     # loop_info = None  # Loop-related information
 
-    def get_method_name(node):
+    def get_method_name(node, java_code):
         method_name_node = [
             child for child in node.children if child.type == 'identifier'][-1]
+        # print(method_name_node, java_code[method_name_node.start_byte:method_name_node.end_byte])
         return java_code[method_name_node.start_byte:method_name_node.end_byte]
 
-    def get_class_name(node):
+    def get_class_name(node, java_code):
         class_name_node = next(
             child for child in node.parent.children if child.type == 'type_identifier')
         return java_code[class_name_node.start_byte:class_name_node.end_byte]
 
-    def get_instance_name(node):
+    def get_instance_name(node, java_code):
         if node.type == "new":
             class_name_node = next(
                 child for child in node.parent.parent.children if child.type == 'identifier')
@@ -145,7 +147,7 @@ def extract_class_method_call_data_from_java_file(file_path, execution_class_nam
                 child for child in node.children if child.type == 'identifier')
         return java_code[class_name_node.start_byte:class_name_node.end_byte]
 
-    def get_argument_list(node):
+    def get_argument_list(node, java_code):
         if node.type == 'new':
             argument_list_node = next(
                 child for child in node.parent.children if child.type == 'argument_list')
@@ -155,11 +157,13 @@ def extract_class_method_call_data_from_java_file(file_path, execution_class_nam
         return java_code[argument_list_node.start_byte:argument_list_node.end_byte]
 
     def traverse(node):
-        def get_method_invocation_and_new_method_diagram_data(child_node):
+        def get_method_invocation_and_new_method_diagram_data(child_node, java_code):
+
             if child_node.type == 'method_invocation':
-                method_name = get_method_name(child_node)
-                argument_list = get_argument_list(child_node)
-                instance_name = get_instance_name(child_node)
+                method_name = get_method_name(child_node, java_code)
+                argument_list = get_argument_list(child_node, java_code)
+                instance_name = get_instance_name(child_node, java_code)
+                # print(child_node, child_node.children,java_code[child_node.start_byte:child_node.end_byte])
 
                 if instance_name != "println":
                     class_name = instance_class_map.get(
@@ -173,17 +177,28 @@ def extract_class_method_call_data_from_java_file(file_path, execution_class_nam
                     diagram_data.append(
                         f"{class_name} --> {execution_class_name} : {return_type}\n")
                     diagram_data.append(f"deactivate {class_name}\n")
-
+                else:
+                    println_node = next(child for child in child_node.children if child.type == "argument_list")
+                    for method_invocation_and_new_method_node in println_node.children:
+                        get_method_invocation_and_new_method_diagram_data(method_invocation_and_new_method_node,
+                                                                          java_code)
             elif child_node.type == 'variable_declarator':
                 # Get new method node in nested layers
-                object_creation_expression_node = next(child for child in child_node.children if child.type == "object_creation_expression")
+                try:
+                    class_name_node = next(child for child in child_node.parent.children if child.type == 'type_identifier')
+                    class_name = java_code[class_name_node.start_byte:class_name_node.end_byte]
+                    instance_name_node = next(child for child in child_node.children if child.type == 'identifier')
+                    instance_name = java_code[instance_name_node.start_byte:instance_name_node.end_byte]
+                    instance_class_map[instance_name] = class_name
+                    object_creation_expression_node = next(child for child in child_node.children if child.type == "object_creation_expression")
+                except Exception as e:
+                    return
+
                 new_function_node = next(child for child in object_creation_expression_node.children if child.type == "new")
-                class_name = get_class_name(new_function_node)
-                instance_name = get_instance_name(new_function_node)
-                argument_list = get_argument_list(new_function_node)
-
+                class_name = get_class_name(new_function_node, java_code)
+                instance_name = get_instance_name(new_function_node, java_code)
+                argument_list = get_argument_list(new_function_node, java_code)
                 instance_class_map[instance_name] = class_name
-
                 diagram_data.append(
                     f"{execution_class_name} -> {class_name} : new{class_name}{argument_list}\n")
                 diagram_data.append(f"activate {class_name}\n")
@@ -191,39 +206,45 @@ def extract_class_method_call_data_from_java_file(file_path, execution_class_nam
                     f"{class_name} --> {execution_class_name} : {class_name}\n")
                 diagram_data.append(f"deactivate {class_name}\n")
 
+        def get_method_invocation_and_new_method_diagram_data_in_if_statement(child, java_code, is_root):
+            for if_child in child.children:
+                if if_child.type == "condition":
+                    if is_root: prefix = "alt"
+                    else: prefix = "else"
+                    condition_code = java_code[if_child.start_byte:if_child.end_byte]
+                    if len(condition_code) > 0:
+                        diagram_data.append(
+                            prefix + " " + java_code[if_child.start_byte:if_child.end_byte][1:-1].strip() + "\n")
+                    else:
+                        diagram_data.append(prefix + " " + "other condition" + "\n")
+                if if_child.type == "block":
+                    # When it is block of else
+                    if child.parent.children[if_child.parent.children.index(if_child) - 1].type == "else":
+                        diagram_data.append("else other condition" + "\n")
+                    if_code = java_code[if_child.start_byte:if_child.end_byte][1:-1].strip()
+                    if_node = parser.parse(bytes(if_code, 'utf8')).root_node
+                    for expression_node in if_node.children:
+                        for method_invocation_and_new_method_node in expression_node.children:
+                            get_method_invocation_and_new_method_diagram_data(method_invocation_and_new_method_node,if_code)
+                elif if_child.type == "if_statement":
+                    get_method_invocation_and_new_method_diagram_data_in_if_statement(if_child, java_code, False)
         for child in node.children:
-            if child.type == "if":
-                expression_statement_nodes = [child for child in node.children if child.type == 'expression_statement']
-                # if s
-        #     elif child.type == "loop":
-        #         loop_variable = get_loop_variable(child)
-        #         loop_start = get_loop_start(child)
-        #         loop_end = get_loop_end(child)
-        #
-        #         loop_info = {
-        #             'loop_variable': loop_variable,
-        #             'loop_start': loop_start,
-        #             'loop_end': loop_end
-        #         }
-        #
-        #         diagram_data.append(
-        #             f"{parent_class} -> {parent_class} : Loop from {loop_start} to {loop_end}\n")
-        #
-        #         # Recursively traverse the loop body
-        #         traverse(child.child_by_field_name('statement'), parent_class)
-        #
-        #         # Reset loop_info after processing the loop
-        #         loop_info = None
-        #
-        #     elif loop_info and child.type == 'block':
-        #     # Inside a loop, traverse the block
-        #     traverse(child, parent_class)
-        #
-        # else:
-        #     traverse(child, parent_class)
+            if child.type == "if_statement":
+                get_method_invocation_and_new_method_diagram_data_in_if_statement(child, java_code, True)
+                diagram_data.append("end" + "\n")
+            elif child.type == "for_statement" or child.type == "while_statement":
+                loop_block = next(child for child in child.children if child.type == "block")
+                diagram_data.append("loop" + "\n")
+                loop_code = java_code[loop_block.start_byte:loop_block.end_byte][1:-1].strip()
+                loop_node = parser.parse(bytes(loop_code, 'utf8')).root_node
+                for expression_node in loop_node.children:
+                    for method_invocation_and_new_method_node in expression_node.children:
+                        get_method_invocation_and_new_method_diagram_data(method_invocation_and_new_method_node,
+                                                                          loop_code)
+                diagram_data.append("end" + "\n")
             else:
                 for method_invocation_and_new_method_node in child.children:
-                    get_method_invocation_and_new_method_diagram_data(method_invocation_and_new_method_node)
+                    get_method_invocation_and_new_method_diagram_data(method_invocation_and_new_method_node, java_code)
 
     diagram_data.append(f"activate {execution_class_name}\n")
     # Traverse the tree
@@ -234,7 +255,7 @@ def extract_class_method_call_data_from_java_file(file_path, execution_class_nam
 
 def create_sequence_diagram(diagram_data):
     sequence_diagram = graphviz.Digraph(format='png')
-    java_file_path = 'java/Main.java'
+    java_file_path = JAVA_FILE_PATH
     extract_class_method_return_type(java_file_path)
 
     my_file = open("Diagrams/MySequenceDiagram.puml", "w+")
@@ -247,6 +268,6 @@ def create_sequence_diagram(diagram_data):
     my_file.close()
 
 
-java_file_path = 'java/Main.java'
+java_file_path = JAVA_FILE_PATH
 diagram_data = extract_class_method_call_data_from_java_file(java_file_path, EXECUTION_CLASS_NAME, EXECUTION_METHOD_NAME)
 create_sequence_diagram(diagram_data)

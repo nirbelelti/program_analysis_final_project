@@ -103,18 +103,25 @@ public class Main {
         person.addCar(car1);
         person.addCar(car2);
 
-        for(int i = 0; i< person.getCars().size(); i++){
-           person.getCars().get(i).getManufacturer();
+        for (int i = 0; i< person.getCars().size(); i++){
+           Car car = person.getCars().get(i);
+           car.getManufacturer();
 
         }
 
-        if(person.getCars().size()>0){
+        if (person.getCars().size()>0) {
             person.calculateInsuranceFee();
+        } else if (person.getCars().size() == 0) {
+            car1.getManufacturer();
+        } else {
+            car2.getManufacturer();
         }
 
-
-
-    }
-
+        List<Car> cars = person.getCars();
+        int carsAmount = cars.size();
+        while (carsAmount--){
+            Car car = car2.get(carsAmount);
+            System.out.println(car.getEngine());
+        }
 
 }
