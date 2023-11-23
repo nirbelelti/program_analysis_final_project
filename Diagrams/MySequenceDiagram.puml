@@ -31,29 +31,29 @@ deactivate Person
 loop
 Main -> Car : getManufacturer()
 activate Car
-Car --> Main : String
+Car --> Main : void
 deactivate Car
 end
 alt person.getCars().size() > 0
 Main -> Person : calculateInsuranceFee()
 activate Person
-Person --> Main : double
+Person --> Main : void
 deactivate Person
 else person.getCars().size() == 0
 Main -> Car : getManufacturer()
 activate Car
-Car --> Main : String
+Car --> Main : void
 deactivate Car
 else other condition
 Main -> Car : getManufacturer()
 activate Car
-Car --> Main : String
+Car --> Main : void
 deactivate Car
 end
 loop
 Main -> Car : getEngine()
 activate Car
-Car --> Main : Engine
+Car --> Main : void
 deactivate Car
 end
 deactivate Main

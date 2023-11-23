@@ -49,12 +49,13 @@ class TestCallMethod(unittest.TestCase):
         self.output_file.close()
         with open("test_output.puml", "r") as fp:
             file_content = fp.read()
-            expected_string = ("@startuml\n"
-                               "ar -> Foo : bar()\n"
-                               "activate Foo\n"
-                               "Foo --> Bar : bar()\nd"
-                               "eactivate Foo\n"
-                               "@enduml\n")
+            print("sssss")
+            print(file_content)
+
+
+
+            expected_string = ("@startuml\nBar -> Foo : bar()\nactivate Foo\nFoo --> Bar : bar()\ndeactivate Foo\n@enduml\n")
+
         self.assertIn(expected_string, file_content, f"File doesn't contain the expected string: {expected_string}")
 
 
